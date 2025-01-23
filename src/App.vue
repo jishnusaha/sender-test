@@ -1,5 +1,7 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import Sort from "./components/Sort.vue";
+</script>
 
 <template>
-  <div>Project Setup</div>
+  <Sort />
 </template>
