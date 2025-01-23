@@ -9,6 +9,8 @@ interface IPeople {
   name: string;
 }
 const isModalVisible = ref<boolean>(false);
+const isSortInProgress = ref<boolean>(false);
+const totalPeople = ref<number>(0);
 const poepleInfoList = ref<IPeople[]>([]);
 
 const openModal = () => {
@@ -18,10 +20,10 @@ const openModal = () => {
 const closeModal = () => {
   isModalVisible.value = false;
 };
-const startSorting = (totalPeople: number) => {
+const startSorting = (count: number) => {
   isModalVisible.value = false;
   const tmp: IPeople[] = [];
-  for (let i = 0; i < totalPeople; i++) {
+  for (let i = 0; i < count; i++) {
     const firstName = generateRandomString(5);
     const lastName = generateRandomString(4);
     tmp.push({
@@ -36,6 +38,8 @@ const startSorting = (totalPeople: number) => {
     [tmp[i], tmp[j]] = [tmp[j], tmp[i]]; // Swap elements
   }
   poepleInfoList.value = tmp;
+  isSortInProgress.value = true;
+  totalPeople.value = count;
 };
 </script>
 
@@ -46,7 +50,25 @@ const startSorting = (totalPeople: number) => {
       <div class="title">Sorting Training System</div>
       <div class="button" @click="openModal">Start sorting!</div>
     </div>
-    <div class="sortingTable"></div>
+    <div class="sortingTableContainer">
+      <div class="title">{{ totalPeople }} people in the list</div>
+      <div class="sortTable">
+        <div class="people">
+          <div>Eamil</div>
+          <div>Name</div>
+          <div>Potatoes</div>
+        </div>
+        <div
+          v-for="(people, index) in poepleInfoList"
+          :key="index"
+          class="people"
+        >
+          <div>{{ people.email }}</div>
+          <div>{{ people.name }}</div>
+          <div>{{ people.potatoes }}</div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -75,9 +97,35 @@ const startSorting = (totalPeople: number) => {
       font-size: 15px;
     }
   }
-  .sortingTable {
+  .sortingTableContainer {
     margin-top: 20px;
     box-shadow: 0px 4px 4px 0px #00000040;
+    border: 1px solid #dddddd;
+    .title {
+      font-size: 14px;
+      font-weight: 700;
+      text-align: right;
+      padding: 20px;
+    }
+    .sortTable {
+      .people {
+        border: 1px solid #dddddd;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        cursor: pointer;
+        /* padding: 15px; */
+        font-size: 14px;
+        font-weight: 400;
+        color: #555555;
+      }
+      .people > *:first-child {
+        border-right: 1px solid #dddddd;
+      }
+
+      .people > * {
+        padding: 15px;
+      }
+    }
   }
 }
 </style>
