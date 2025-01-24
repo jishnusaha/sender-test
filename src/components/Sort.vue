@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { VueDraggableNext } from "vue-draggable-next";
 import Modal from "./Modal.vue";
 import { generateRandomString } from "../libs.ts";
 
@@ -58,15 +59,17 @@ const startSorting = (count: number) => {
           <div>Name</div>
           <div>Potatoes</div>
         </div>
-        <div
-          v-for="(people, index) in poepleInfoList"
-          :key="index"
-          class="people"
-        >
-          <div>{{ people.email }}</div>
-          <div>{{ people.name }}</div>
-          <div>{{ people.potatoes }}</div>
-        </div>
+        <VueDraggableNext v-model="poepleInfoList" tag="div" item-key="email">
+          <div
+            v-for="(people, index) in poepleInfoList"
+            :key="index"
+            class="people"
+          >
+            <div>{{ people.email }}</div>
+            <div>{{ people.name }}</div>
+            <div>{{ people.potatoes }}</div>
+          </div>
+        </VueDraggableNext>
       </div>
     </div>
   </div>
