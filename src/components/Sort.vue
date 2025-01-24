@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onUnmounted, ref } from "vue";
 import { VueDraggableNext } from "vue-draggable-next";
 import Modal from "./Modal.vue";
 import { generateRandomString } from "../libs.ts";
@@ -9,10 +9,12 @@ interface IPeople {
   potatoes: number;
   name: string;
 }
-const isModalVisible = ref<boolean>(false);
-const isSortInProgress = ref<boolean>(false);
 const totalPeople = ref<number>(0);
 const poepleInfoList = ref<IPeople[]>([]);
+const isModalVisible = ref<boolean>(false);
+const isSortInProgress = ref<boolean>(false);
+const timer = ref<number>(0);
+let intervalId: number | null = null;
 
 const openModal = () => {
   isModalVisible.value = true;
@@ -41,7 +43,40 @@ const startSorting = (count: number) => {
   poepleInfoList.value = tmp;
   isSortInProgress.value = true;
   totalPeople.value = count;
+  startTimer();
 };
+
+const startTimer = () => {
+  timer.value = 0;
+  if (intervalId) clearInterval(intervalId);
+  intervalId = setInterval(() => {
+    timer.value++;
+  }, 1000);
+};
+const onDragEnd = () => {
+  let sorted = true;
+
+  for (let i = 0; i < poepleInfoList.value.length - 1; i++) {
+    if (
+      poepleInfoList.value[i].potatoes < poepleInfoList.value[i + 1].potatoes
+    ) {
+      sorted = false;
+      break;
+    }
+  }
+  if (sorted) {
+    clearInterval(intervalId!);
+    isSortInProgress.value = false;
+    alert(
+      `Congrats. You took ${timer.value} seconds to sort the people based on potatoes`
+    );
+  }
+};
+
+// Cleanup timer when component unmounts
+onUnmounted(() => {
+  if (intervalId) clearInterval(intervalId);
+});
 </script>
 
 <template>
@@ -49,9 +84,13 @@ const startSorting = (count: number) => {
   <div class="sortContainer">
     <div class="titleContainer">
       <div class="title">Sorting Training System</div>
-      <div class="button" @click="openModal">Start sorting!</div>
+
+      <div class="button" v-if="!isSortInProgress" @click="openModal">
+        Start sorting!
+      </div>
+      <div class="button" v-if="isSortInProgress">Time: {{ timer }}</div>
     </div>
-    <div class="sortingTableContainer">
+    <div class="sortingTableContainer" v-if="isSortInProgress">
       <div class="title">{{ totalPeople }} people in the list</div>
       <div class="sortTable">
         <div class="people">
@@ -59,7 +98,12 @@ const startSorting = (count: number) => {
           <div>Name</div>
           <div>Potatoes</div>
         </div>
-        <VueDraggableNext v-model="poepleInfoList" tag="div" item-key="email">
+        <VueDraggableNext
+          @end="onDragEnd"
+          v-model="poepleInfoList"
+          tag="div"
+          item-key="email"
+        >
           <div
             v-for="(people, index) in poepleInfoList"
             :key="index"
