@@ -2,6 +2,7 @@
 import { onUnmounted, ref } from "vue";
 import { VueDraggableNext } from "vue-draggable-next";
 import InputModal from "./InputModal.vue";
+import SuccessModal from "./SuccessModal.vue";
 import { generateRandomString } from "../libs.ts";
 
 interface IPeople {
@@ -15,6 +16,7 @@ const isInputModalVisible = ref<boolean>(false);
 const isSortInProgress = ref<boolean>(false);
 const timer = ref<number>(0);
 let intervalId: number | null = null;
+const isSuccessModalVisible = ref<boolean>(false);
 
 const openInputModal = () => {
   isInputModalVisible.value = true;
@@ -23,6 +25,16 @@ const openInputModal = () => {
 const closeInputModal = () => {
   isInputModalVisible.value = false;
 };
+
+const openSuccessModal = () => {
+  isSuccessModalVisible.value = true;
+};
+
+const closeSuccessModal = () => {
+  isSortInProgress.value = false;
+  isSuccessModalVisible.value = false;
+};
+
 const startSorting = (count: number) => {
   isInputModalVisible.value = false;
   const tmp: IPeople[] = [];
@@ -66,10 +78,7 @@ const onDragEnd = () => {
   }
   if (sorted) {
     clearInterval(intervalId!);
-    isSortInProgress.value = false;
-    alert(
-      `Congrats. You took ${timer.value} seconds to sort the people based on potatoes`
-    );
+    openSuccessModal();
   }
 };
 
@@ -80,6 +89,11 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <SuccessModal
+    v-if="isSuccessModalVisible"
+    @close="closeSuccessModal"
+    :time="timer"
+  />
   <InputModal
     v-if="isInputModalVisible"
     @close="closeInputModal"
