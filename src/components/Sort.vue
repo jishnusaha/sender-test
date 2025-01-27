@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onUnmounted, ref } from "vue";
 import { VueDraggableNext } from "vue-draggable-next";
-import Modal from "./Modal.vue";
+import InputModal from "./InputModal.vue";
 import { generateRandomString } from "../libs.ts";
 
 interface IPeople {
@@ -11,20 +11,20 @@ interface IPeople {
 }
 const totalPeople = ref<number>(0);
 const poepleInfoList = ref<IPeople[]>([]);
-const isModalVisible = ref<boolean>(false);
+const isInputModalVisible = ref<boolean>(false);
 const isSortInProgress = ref<boolean>(false);
 const timer = ref<number>(0);
 let intervalId: number | null = null;
 
-const openModal = () => {
-  isModalVisible.value = true;
+const openInputModal = () => {
+  isInputModalVisible.value = true;
 };
 
-const closeModal = () => {
-  isModalVisible.value = false;
+const closeInputModal = () => {
+  isInputModalVisible.value = false;
 };
 const startSorting = (count: number) => {
-  isModalVisible.value = false;
+  isInputModalVisible.value = false;
   const tmp: IPeople[] = [];
   for (let i = 0; i < count; i++) {
     const firstName = generateRandomString(5);
@@ -80,12 +80,16 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <Modal v-if="isModalVisible" @close="closeModal" @start="startSorting" />
+  <InputModal
+    v-if="isInputModalVisible"
+    @close="closeInputModal"
+    @start="startSorting"
+  />
   <div class="sortContainer">
     <div class="titleContainer">
       <div class="title">Sorting Training System</div>
 
-      <div class="button" v-if="!isSortInProgress" @click="openModal">
+      <div class="button" v-if="!isSortInProgress" @click="openInputModal">
         Start sorting!
       </div>
       <div class="button" v-if="isSortInProgress">Time: {{ timer }}</div>
